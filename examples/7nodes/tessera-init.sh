@@ -31,7 +31,7 @@ function getPeerIPs() {
 }
 
 
-numNodes=7
+numNodes=4
 if [[ -f qdata/numberOfNodes ]]; then
     numNodes=`cat qdata/numberOfNodes`
 fi
@@ -89,7 +89,114 @@ done
 
 # Write the config for the Tessera nodes
 currentDir=$(pwd)
-for i in `seq 1 ${numNodes}`
+i=1
+DDIR="${currentDir}/qdata/c${i}"
+    mkdir -p ${DDIR}
+    mkdir -p qdata/logs
+    if [ "$encryptorType" == "NACL" ]; then
+        cp "keys/tm1.pub" "${DDIR}/tm1.pub"
+        cp "keys/tm1.key" "${DDIR}/tm1.key"
+        cp "keys/tm5.pub" "${DDIR}/tm5.pub"
+        cp "keys/tm5.key" "${DDIR}/tm5.key"
+        cp "keys/tm6.pub" "${DDIR}/tm6.pub"
+        cp "keys/tm6.key" "${DDIR}/tm6.key"
+        cp "keys/tm7.pub" "${DDIR}/tm7.pub"
+        cp "keys/tm7.key" "${DDIR}/tm7.key"
+    fi
+    rm -f "${DDIR}/tm.ipc"
+
+    serverPortP2P=$((9000 + ${i}))
+    serverPortThirdParty=$((9080 + ${i}))
+    serverPortEnclave=$((9180 + ${i}))
+
+    #change tls to "strict" to enable it (don't forget to also change http -> https)
+cat <<EOF > ${DDIR}/tessera-config-09-${i}.json
+{
+    "encryptor":{
+        "type":"${encryptorType}",
+        "properties":{
+            ${encryptorProps}
+        }
+    },
+    "useWhiteList": false,
+    "jdbc": {
+        "username": "sa",
+        "password": "",
+        "url": "jdbc:h2:${DDIR}/db${i};MODE=Oracle;TRACE_LEVEL_SYSTEM_OUT=0",
+        "autoCreateTables": true
+    },
+    "serverConfigs":[
+        {
+            "app":"ThirdParty",
+            "enabled": true,
+            "serverAddress": "http://localhost:${serverPortThirdParty}",
+            "cors" : {
+                "allowedMethods" : ["GET", "OPTIONS"],
+                "allowedOrigins" : ["*"]
+            },
+            "communicationType" : "REST"
+        },
+        {
+            "app":"Q2T",
+            "enabled": true,
+            "serverAddress":"unix:${DDIR}/tm.ipc",
+            "communicationType" : "REST"
+        },
+        {
+            "app":"P2P",
+            "enabled": true,
+            "serverAddress":"http://127.0.0.1:${serverPortP2P}",
+            "sslConfig": {
+                "tls": "OFF",
+                "generateKeyStoreIfNotExisted": true,
+                "serverKeyStore": "${DDIR}/server${i}-keystore",
+                "serverKeyStorePassword": "quorum",
+                "serverTrustStore": "${DDIR}/server-truststore",
+                "serverTrustStorePassword": "quorum",
+                "serverTrustMode": "TOFU",
+                "knownClientsFile": "${DDIR}/knownClients",
+                "clientKeyStore": "${DDIR}/client${i}-keystore",
+                "clientKeyStorePassword": "quorum",
+                "clientTrustStore": "${DDIR}/client-truststore",
+                "clientTrustStorePassword": "quorum",
+                "clientTrustMode": "TOFU",
+                "knownServersFile": "${DDIR}/knownServers"
+            },
+            "communicationType" : "REST"
+        }
+    ],
+    "peer": [
+        ${peerList}
+    ],
+    "keys": {
+        "passwords": [],
+        "keyData": [
+            {
+                "privateKeyPath": "${DDIR}/tm1.key",
+                "publicKeyPath": "${DDIR}/tm1.pub"
+            },
+            {
+                "privateKeyPath": "${DDIR}/tm5.key",
+                "publicKeyPath": "${DDIR}/tm5.pub"
+            },
+            {
+                "privateKeyPath": "${DDIR}/tm6.key",
+                "publicKeyPath": "${DDIR}/tm6.pub"
+            },
+            {
+                "privateKeyPath": "${DDIR}/tm7.key",
+                "publicKeyPath": "${DDIR}/tm7.pub"
+            }
+        ]
+    },
+    "alwaysSendTo": [],
+    "features": {
+        "enablePrivacyEnhancements": "true"
+    }
+}
+EOF
+
+for i in `seq 2 ${numNodes}`
 do
     DDIR="${currentDir}/qdata/c${i}"
     mkdir -p ${DDIR}

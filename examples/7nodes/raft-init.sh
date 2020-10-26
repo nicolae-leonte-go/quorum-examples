@@ -13,7 +13,7 @@ function usage() {
   exit -1
 }
 
-numNodes=7
+numNodes=4
 while (( "$#" )); do
     case "$1" in
         --numNodes)
