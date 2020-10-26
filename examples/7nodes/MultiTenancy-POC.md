@@ -91,6 +91,7 @@ acc.get()
 ```
 The `acc.IncEvent().watch(...)` creates the relevant filter for the InvEvent and then starts watching for new events. Confirm that the state of the contract in all consoles is 1.
 
+#### Invoke `acc.inc()` on a subset of the original participants
 On node4's console do (increment for key1, key5, key6):
 ```javascript
 acc.inc(1,{from:eth.accounts[0],privateFor:["BULeR8JyUWhiuuCMU/HLA0Q5pzkYT+cHII3ZKBey3Bo=", "R56gy4dn24YOjwyesTczYa8m5xhP6hF2uTMCju/1xkY=", "UfNSeSGySeKg11DVNEnqrUtxYRVor4+CvluI8tVv62Y="]});
@@ -109,6 +110,6 @@ On node4's console do (increment for key1, key5):
 acc.inc(1,{from:eth.accounts[0],privateFor:["BULeR8JyUWhiuuCMU/HLA0Q5pzkYT+cHII3ZKBey3Bo=", "R56gy4dn24YOjwyesTczYa8m5xhP6hF2uTMCju/1xkY="]});
 ``` 
 
-Do an `acc.get()` in all consoles. You should get `3` in node1 consoles 1 and 2, `2` in node1 console 3, `1` node1 console 1 and 4 in node4's console.
+Do an `acc.get()` in all consoles. You should get `3` in node1 consoles 1 and 2, `2` in node1 console 3, `1` node1 console 4 and `3` in node4's console.
 
 Do an `eth.getTransactionReceipt("0x34f881b717ddb3b1ab05fb948d375b593f4c74576258915e06a7f9cd9d0d15f4")` (the last transaction from node4) in all consoles and observe the different results (similar to the observed states above).
