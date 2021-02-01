@@ -189,6 +189,28 @@ cat <<EOF > ${DDIR}/tessera-config-09-${i}.json
             }
         ]
     },
+    "residentGroups":[
+        {
+            "name":"private",
+            "description":"default privacy group",
+            "members":["$(<${DDIR}/tm1.pub)"]
+        },
+        {
+            "name":"PS1",
+            "description":"Privacy Group 1",
+            "members":["$(<${DDIR}/tm5.pub)"]
+        },
+        {
+            "name":"PS2",
+            "description":"Privacy Group 2",
+            "members":["$(<${DDIR}/tm6.pub)"]
+        },
+        {
+            "name":"PS3",
+            "description":"Privacy Group 3",
+            "members":["$(<${DDIR}/tm7.pub)"]
+        }
+    ],
     "alwaysSendTo": [],
     "features": {
         "enablePrivacyEnhancements": "true"
@@ -279,6 +301,13 @@ cat <<EOF > ${DDIR}/tessera-config-09-${i}.json
             }
         ]
     },
+    "residentGroups":[
+        {
+            "name":"private",
+            "description":"default privacy group",
+            "members":["$(<${DDIR}/tm.pub)"]
+        }
+    ],
     "alwaysSendTo": []
 }
 EOF
