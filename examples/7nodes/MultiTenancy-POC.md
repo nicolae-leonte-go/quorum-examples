@@ -2,7 +2,7 @@
 ## Set Up
 Make sure to build quorum and tessera from the following branches:
 * quorum - QuorumEngineering/quorum/multitenant-mps-poc
-* tessera - QuorumEngineering/tessera/multitenant
+* tessera - QuorumEngineering/tessera/resident-groups
 
 Adjust your path/TESSEAR_JAR and run:
 ```shell script
@@ -11,6 +11,33 @@ Adjust your path/TESSEAR_JAR and run:
 ```
 
 The above sets up tessera node1 with key1, key5, key6 and key7 and starts the raft network.
+This is the residentGroups configuration:
+```json
+    "residentGroups":[
+        {
+            "name":"private",
+            "description":"default privacy group",
+            "members":["BULeR8JyUWhiuuCMU/HLA0Q5pzkYT+cHII3ZKBey3Bo="]
+        },
+        {
+            "name":"PS1",
+            "description":"Privacy Group 1",
+            "members":["R56gy4dn24YOjwyesTczYa8m5xhP6hF2uTMCju/1xkY="]
+        },
+        {
+            "name":"PS2",
+            "description":"Privacy Group 2",
+            "members":["UfNSeSGySeKg11DVNEnqrUtxYRVor4+CvluI8tVv62Y="]
+        },
+        {
+            "name":"PS3",
+            "description":"Privacy Group 3",
+            "members":["ROAZBWtSacxXQrOe3FGAqJDyJjFePR5ce4TSIzmJ0Bc="]
+        }
+    ],
+
+```
+
 
 ## Exercising multiple states
 ### Accumulator contract
@@ -43,27 +70,27 @@ contract accumulator {
 
 Open 4 consoles to node1:
 
-* Console1 - key1 (BULeR8JyUWhiuuCMU/HLA0Q5pzkYT+cHII3ZKBey3Bo=) 
+* Console1 - using the "private" state - key1 (BULeR8JyUWhiuuCMU/HLA0Q5pzkYT+cHII3ZKBey3Bo=) 
 ```shell script
-PSI="BULeR8JyUWhiuuCMU/HLA0Q5pzkYT+cHII3ZKBey3Bo=" geth attach http://localhost:22000
+geth attach http://localhost:22000
 ```
-* Console2 - key5 (R56gy4dn24YOjwyesTczYa8m5xhP6hF2uTMCju/1xkY=) 
+* Console2 - using the "PS1" state - key5 (R56gy4dn24YOjwyesTczYa8m5xhP6hF2uTMCju/1xkY=) 
 ```shell script
-PSI="R56gy4dn24YOjwyesTczYa8m5xhP6hF2uTMCju/1xkY=" geth attach http://localhost:22000
+geth attach http://localhost:22000/?PSI=PS1
 ```
-* Console3 - key6 (UfNSeSGySeKg11DVNEnqrUtxYRVor4+CvluI8tVv62Y=) 
+* Console3 - using the "PS2" state - key6 (UfNSeSGySeKg11DVNEnqrUtxYRVor4+CvluI8tVv62Y=) 
 ```shell script
-PSI="UfNSeSGySeKg11DVNEnqrUtxYRVor4+CvluI8tVv62Y=" geth attach http://localhost:22000
+geth attach http://localhost:22000/?PSI=PS2
 ```
-* Console3 - key7 (ROAZBWtSacxXQrOe3FGAqJDyJjFePR5ce4TSIzmJ0Bc=) 
+* Console4 - using the "PS3" state - key7 (ROAZBWtSacxXQrOe3FGAqJDyJjFePR5ce4TSIzmJ0Bc=) 
 ```shell script
-PSI="ROAZBWtSacxXQrOe3FGAqJDyJjFePR5ce4TSIzmJ0Bc=" geth attach http://localhost:22000
+geth attach http://localhost:22000/?PSI=PS3
 ```
 
 Open one console to node4:
 
 ```shell script
-geth attach qdata/dd4/geth.ipc 
+geth attach http://localhost:22003
 ```
 
 ### Steps
