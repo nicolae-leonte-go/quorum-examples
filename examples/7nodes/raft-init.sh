@@ -72,6 +72,10 @@ do
     geth --datadir qdata/dd${i} init genesis.json
 done
 
+cp keys/key5 qdata/dd1/keystore
+cp keys/key6 qdata/dd1/keystore
+cp keys/key7 qdata/dd1/keystore
+
 #Initialise Tessera configuration
 ./tessera-init.sh
 

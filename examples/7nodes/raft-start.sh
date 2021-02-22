@@ -124,8 +124,9 @@ chk=`geth help | grep "allow-insecure-unlock" | wc -l`
 if (( $chk == 1 )); then
     allowSecureUnlock="--allow-insecure-unlock"
 fi
-ARGS="--nodiscover --nousb ${allowSecureUnlock} --verbosity ${verbosity} --networkid $NETWORK_ID --raft --raftblocktime ${blockTime} --rpc --rpccorsdomain=* --rpcvhosts=* --rpcaddr 0.0.0.0 --rpcapi admin,eth,debug,miner,net,shh,txpool,personal,web3,quorum,raft,quorumPermission,quorumExtension --emitcheckpoints --unlock 0 --password passwords.txt $QUORUM_GETH_ARGS"
-
+ARGS="--nodiscover --nousb ${allowSecureUnlock} --verbosity ${verbosity} --networkid $NETWORK_ID --raft --raftblocktime ${blockTime} --rpc --rpccorsdomain=* --rpcvhosts=* --rpcaddr 0.0.0.0 --rpcapi admin,eth,debug,miner,net,shh,txpool,personal,web3,quorum,raft,quorumPermission,quorumExtension --emitcheckpoints $QUORUM_GETH_ARGS"
+UNLOCK_ALL="--unlock 0 --password passwords.txt"
+UNLOCK_NODE1="--unlock 0,1,2,3 --password passwords.txt"
 basePort=21000
 baseRpcPort=22000
 baseRaftPort=50401
@@ -141,7 +142,12 @@ do
         permissioned="--permissioned"
     fi
 
-    PRIVATE_CONFIG=qdata/c${i}/tm.ipc nohup geth --datadir qdata/dd${i} ${ARGS} ${permissioned} --raftport ${raftPort} --rpcport ${rpcPort} --port ${port} 2>>qdata/logs/${i}.log &
+    UNLOCK=$UNLOCK_ALL
+    if [[ $i -eq 1 ]]; then
+        UNLOCK=$UNLOCK_NODE1
+    fi
+
+    PRIVATE_CONFIG=qdata/c${i}/tm.ipc nohup geth --datadir qdata/dd${i} ${ARGS} ${UNLOCK} ${permissioned} --raftport ${raftPort} --rpcport ${rpcPort} --port ${port} 2>>qdata/logs/${i}.log &
 done
 
 set +v
